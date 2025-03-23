@@ -1,0 +1,37 @@
+body {
+    background-color: white;
+    font-family: "Montserrat", sans-serif;
+}
+footer > h4 {
+    font-family: "Montserrat", sans-serif;
+    text-align: center;
+}
+.flex-asem {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+.reg-actions {
+    color: white;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+.reg-actions:hover {
+    color: gray;
+}
+.login-form {
+    display: flex;
+    height: 80vh;
+    justify-content: center;
+    align-items: center;
+}
+.flash-message-good {
+    margin-top: 2rem;
+    text-align: center;
+    color: #39FF14
+}
+.flash-message-bad {
+    margin-top: 2rem;
+    text-align: center;
+    color: red;
+}

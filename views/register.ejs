@@ -1,0 +1,47 @@
+<%-include("partials/header.ejs")%>
+<% if (locals.flashMessage) { %>
+    <h3 class="flash-message-bad"><%=flashMessage%></h3>
+    <% } %>
+<div class="login-form">
+    <form method="POST" action="/register">
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Username</label>
+            <input type="text" class="form-control bg-dark text-white" id="exampleInputEmail1" aria-describedby="emailHelp" name="regusername" required>
+            <div id="emailHelp" class="form-text">We'll never share your data with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword1" name="regpassword" required>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Confirm password</label>
+            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword2" name="confirmpassword" oninput="checkPassword()" required>
+            <span id="pass-checker"></span>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
+            <label class="form-check-label" for="exampleCheck1">I agree to the Terms of service</label>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+    </form>
+</div>
+<script type="text/javascript">
+    function checkPassword() {
+        let pass1 = document.querySelector("#exampleInputPassword1");
+        let pass2 = document.querySelector("#exampleInputPassword2");
+        let passCheck = document.querySelector("#pass-checker");
+        let button = document.querySelector("#submit");
+        passCheck.style.fontWeight = "600";
+        if (pass1.value !== pass2.value) {
+            passCheck.style.color = "red";
+            passCheck.textContent = "Passwords do not match!";
+            button.setAttribute("disabled", "");
+        } else {
+            let passCheck = document.querySelector("#pass-checker")
+            passCheck.style.color = "green";
+            passCheck.textContent = "Passwords match!";
+            button.disabled = false;
+        }
+    }
+</script>
+<%-include("partials/footer.ejs")%>
