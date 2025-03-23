@@ -46,7 +46,7 @@ app.get("/home", (req,res) => {
     } else {
         res.redirect("/login");
     }
-}); // Doesn't work as expected, home routing takes ID
+}); // Doesn't work as expected, home routing takes ID, this doesn't, dunno what to do honestly.
 
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
