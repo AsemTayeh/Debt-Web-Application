@@ -80,8 +80,6 @@ export async function verifyUserLogin(email, password) {
       } else {
         return rows[0].username;
       }
-  
-      
     } catch (err) {
       console.error("Error verifying user:", err);
     } finally {
