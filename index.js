@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
     if (isUserTaken) {
-        return res.redirect("/register");
+        res.redirect("/register");
     }
     createUser(req.body["regusername"], req.body["regpassword"]);
     loggedIn = true;
