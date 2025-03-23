@@ -1,5 +1,6 @@
-import {createUser} from "./queries.js";
+import { createUser } from "./queries.js";
 import { verifyUsername } from "./queries.js";
+import { verifyUserLogin } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -7,11 +8,33 @@ import express from "express";
 const PORT = 3000;
 const app = express();
 let loggedIn = false;
-let flashMessage = "";
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
+
+app.get("/home/:id", (req,res) => {
+    res.render("index.ejs");
+})
+
+app.post("/login", async (req,res) => {
+    const verifyUser = await verifyUserLogin(req.body["username"], req.body["password"]);
+    if (verifyUser === false) {
+        res.redirect("/login");
+    }
+    else {
+        loggedIn = true;
+        res.redirect(`/home/${verifyUser}`);
+    }
+});
+
+app.get("/home", (req,res) => {
+    if (loggedIn) {
+        res.render("index.ejs");
+    } else {
+        res.redirect("/login");
+    }
+});
 
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
@@ -21,14 +44,6 @@ app.post("/register", async (req,res) => {
     createUser(req.body["regusername"], req.body["regpassword"]);
     loggedIn = true;
     res.redirect("/home");
-});
-
-app.get("/home", (req,res) => {
-    if (loggedIn) {
-        res.render("index.ejs");
-    } else {
-        res.render("login.ejs");
-    }
 });
 
 app.get("/login", (req,res) => { 

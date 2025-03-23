@@ -35,3 +35,34 @@ export async function verifyUsername(name) {
         await db.end();
       }
 }
+
+export async function verifyUserLogin(email, password) {
+    const db = await connectDB();
+  
+    try {
+      const [rows] = await db.execute(
+        "SELECT ID, hashed_password FROM users WHERE username = ?",
+        [email]
+      );
+  
+      if (rows.length === 0) {
+        console.log("User not found");
+        return false;
+      }
+  
+      const user = rows[0];
+      const isMatch = await bcrypt.compare(password, user.hashed_password);
+  
+      if (isMatch) {
+        console.log(`Login successful for user ID: ${user.ID}`);
+        return user.ID;
+      } else {
+        console.log("Incorrect password");
+        return false;
+      }
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }
