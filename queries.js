@@ -65,3 +65,26 @@ export async function verifyUserLogin(email, password) {
       await db.end();
     }
   }
+
+  export async function getUserName(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT username FROM users WHERE ID = ?",
+        [id]
+      );
+  
+      if (rows.length === 0) {
+        console.log("User not found");
+        return false;
+      } else {
+        return rows[0].username;
+      }
+  
+      
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }

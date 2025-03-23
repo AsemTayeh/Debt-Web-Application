@@ -1,6 +1,7 @@
 import { createUser } from "./queries.js";
 import { verifyUsername } from "./queries.js";
 import { verifyUserLogin } from "./queries.js";
+import { getUserName } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -18,9 +19,11 @@ app.get("/logout", (req,res) => {
     res.redirect("/login");
 })
 
-app.get("/home/:id", (req,res) => {
-    res.render("index.ejs");
-})
+app.get("/home/:id", async (req,res) => {
+    res.render("index.ejs", {
+        welcome: "Welcome back " +  await getUserName(req.params.id)
+    });
+});
 
 app.post("/login", async (req,res) => {
     const verifyUser = await verifyUserLogin(req.body["username"], req.body["password"]);
