@@ -20,9 +20,13 @@ app.get("/logout", (req,res) => {
 })
 
 app.get("/home/:id", async (req,res) => {
-    res.render("index.ejs", {
-        welcome: "Welcome back " +  await getUserName(req.params.id)
-    });
+    if (!loggedIn) {
+        res.redirect("/login");
+    } else {
+        res.render("index.ejs", {
+            welcome: "Welcome back " +  await getUserName(req.params.id)
+        });
+    }
 });
 
 app.post("/login", async (req,res) => {
