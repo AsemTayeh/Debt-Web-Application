@@ -10,7 +10,9 @@ export async function createUser(name, password) {
           "INSERT INTO users (username, hashed_password) VALUES (?, ?)", 
           [name, hashedPassword]
         );
-        console.log(`User added with ID: ${result.insertId}`);
+        const lastInsertedId = result.insertId;
+        console.log("Last Inserted ID:", lastInsertedId);
+        return lastInsertedId;
       } catch (err) {
         console.error("Error adding user:", err);
       } finally {

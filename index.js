@@ -46,16 +46,16 @@ app.get("/home", (req,res) => {
     } else {
         res.redirect("/login");
     }
-});
+}); // Doesn't work as expected, home routing takes ID
 
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
     if (isUserTaken) {
         res.redirect("/register");
     }
-    createUser(req.body["regusername"], req.body["regpassword"]);
+    const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
     loggedIn = true;
-    res.redirect("/home");
+    res.redirect(`/home/${userID}`);
 });
 
 app.get("/login", (req,res) => { 
