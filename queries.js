@@ -38,7 +38,6 @@ export async function verifyUsername(name) {
 
 export async function verifyUserLogin(email, password) {
     const db = await connectDB();
-  
     try {
       const [rows] = await db.execute(
         "SELECT ID, hashed_password FROM users WHERE username = ?",

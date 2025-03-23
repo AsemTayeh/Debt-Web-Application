@@ -13,6 +13,11 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
 
+app.get("/logout", (req,res) => {
+    loggedIn = false;
+    res.redirect("/login");
+})
+
 app.get("/home/:id", (req,res) => {
     res.render("index.ejs");
 })
@@ -56,7 +61,7 @@ app.get("/register", (req,res) => {
 });
 
 app.get("/", (req,res) => {
-    res.render("login.ejs");
+    res.render("register.ejs");
 });
 
 app.listen(PORT, () => {
