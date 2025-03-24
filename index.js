@@ -6,6 +6,7 @@ import { getDebts } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
+import session from "express-session";
 
 const PORT = 3000;
 const app = express();
