@@ -35,12 +35,13 @@ app.get("/view/:id", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles authorization
+        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
         if (!canSee) {
             res.status(404).sendFile("Four0Four.html", {root: "public"});
         } else {
-            res.redirect("/update"); // TEST THIS WILL REROUTE TO VIEW PAGE WHERE WE
-            // WE QUERY THE NOTE AND GET THE PAGE
+            res.render("view.ejs", {
+                objArrayOneEl: canSee
+            });
         }
     }
 });

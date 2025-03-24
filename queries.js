@@ -191,15 +191,15 @@ export async function verifyUserLogin(email, password) {
     const db = await connectDB();
     try {
         const [result] = await db.execute(
-          "SELECT amount FROM debtrecords WHERE ID = ? AND userID = ?", 
+          "SELECT amount, note FROM debtrecords WHERE ID = ? AND userID = ?", 
           [recordID, userID]
         );
-        console.log(result);
         if (result.length === 0) {
           console.log("User is not authorized to view record of other user or DNE");
           return false;
         } else {
-          return true;
+          console.log(result);
+          return result;
         }
       } catch (err) {
         console.error("Error adding user:", err);
