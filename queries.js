@@ -171,7 +171,7 @@ export async function verifyUserLogin(email, password) {
         return true;
       }
     } catch (err) {
-      console.error("Error verifying user:", err);
+      console.error("Error verifying record:", err);
     } finally {
       await db.end();
     }
@@ -201,6 +201,31 @@ export async function verifyUserLogin(email, password) {
           console.log(result);
           return result;
         }
+      } catch (err) {
+        console.error("Error updating record:", err);
+      } finally {
+        await db.end();
+      }
+  }
+
+  export async function updateRecord(value, note, userID, recordID) {
+    const userExists = await verifyUserExistence(userID);
+    if (!userExists) {
+      console.log("User not found in updateRecord");
+      return false;
+    }
+    const recordExists = await verifyRecordExistence(recordID);
+    if (!recordExists) {
+      console.log("Record not found in update record");
+      return false;
+    }
+    const db = await connectDB();
+    try {
+        const [result] = await db.execute(
+          "UPDATE debtrecords SET amount = ?, note = ? WHERE userID = ? AND ID = ?", 
+          [value, note, userID, recordID]
+        );
+        return true;
       } catch (err) {
         console.error("Error adding user:", err);
       } finally {

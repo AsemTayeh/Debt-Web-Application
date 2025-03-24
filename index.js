@@ -6,6 +6,7 @@ import { getDebts } from "./queries.js";
 import { setMessage } from "./queries.js";
 import { insertRecord } from "./queries.js";
 import { checkIfUserCanViewRecord } from "./queries.js";
+import { updateRecord } from "./queries.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
 import morgan from "morgan";
@@ -38,17 +39,33 @@ app.use((req, res, next) => {
 // add views for view, update, delete
 // When handling view/blogID and update, make sure to query BEFORE to know if the user can see
 // said blog ID
-
+app.post("/update-record", async (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+        const canUpdate = await updateRecord(parseInt(req.body["updAmount"]), req.body["updNote"], req.session.userID, parseInt(req.body["updID"]));
+        if (!canUpdate) {
+            req.flash("error", "Error updating record");
+            res.redirect("/home");
+        } else {
+            req.flash("success", "Updated record successfully!");
+            res.redirect("/home");
+        }
+    }
+});
 app.get("/update/:id", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
+        const debtID = req.params.id;
+        const canSee = await checkIfUserCanViewRecord(debtID, req.session.userID); // handles record and user existence as well
+        console.log(debtID);
         if (!canSee) {
             res.status(404).sendFile("Four0Four.html", {root: "public"});
         } else {
             res.render("update.ejs", {
-                objArrayOneEl: canSee
+                objArrayOneEl: canSee,
+                debtID: debtID
             });
         }
     }
