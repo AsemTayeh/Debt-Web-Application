@@ -42,7 +42,7 @@ app.post("/update-record", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canUpdate = await updateRecord(parseInt(req.body["updAmount"]).trim(), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
+        const canUpdate = await updateRecord(parseInt(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
         if (!canUpdate) {
             req.flash("error", "Error updating record");
             res.redirect("/home");
@@ -88,7 +88,7 @@ app.post("/add-debt", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        await insertRecord(req.body["value"], req.body["note"], req.session.userID);
+        await insertRecord(parseInt(req.body["value"].trim()), req.body["note"], req.session.userID);
         req.flash("success", "Record added successfully!");
         res.redirect("/home");
     }
@@ -135,7 +135,7 @@ app.post("/login", async (req,res) => {
 });
 
 app.post("/register", async (req,res) => {
-    const isUserTaken = await verifyUsername(req.body["regusername"]);
+    const isUserTaken = await verifyUsername(req.body["regusername"].trim());
     if (isUserTaken) {
         req.flash("error", "Username is taken");
         res.redirect("/register");
