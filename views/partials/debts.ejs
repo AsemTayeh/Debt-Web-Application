@@ -16,7 +16,9 @@
                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
                         <a href="/view/<%=debt.ID%>" class="btn btn-primary">View</a>
                         <a href="/update/<%=debt.ID%>" class="btn btn-warning">Update</a>
-                        <a href="/delete/<%=debt.ID%>" class="btn btn-danger">Delete</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Delete
+                          </button>
                     </div>
                   </div>
                 </div>
@@ -29,3 +31,22 @@
     <% } %>
 
 </div> <!--END OF HOME CONTAINER DIV THAT IS FLEX AND IS USED TO DISPLAY ITEMS, ITEMS MUST GO ABOVE-->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        </div>
+        <div class="modal-body">
+          This will permenantly delete this record from our databases.
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <form action="/delete" method="POST">
+                <button type="button" class="btn btn-danger">Delete record</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -35,16 +35,14 @@ app.use((req, res, next) => {
 });
 
 // Fix styling in debts.ejs for cards, use user tees pass tees to see cards
-// Add routing for /view/:id etc, which are sent also from debts.ejs
-// add views for view, update, delete
-// When handling view/blogID and update, make sure to query BEFORE to know if the user can see
-// said blog ID
+// Continue working on debts.ejs -> how to pass specific object data to modal
+// Delete POST handling
 
 app.post("/update-record", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canUpdate = await updateRecord(parseInt(req.body["updAmount"]), req.body["updNote"], req.session.userID, parseInt(req.body["updID"]));
+        const canUpdate = await updateRecord(parseInt(req.body["updAmount"]).trim(), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
         if (!canUpdate) {
             req.flash("error", "Error updating record");
             res.redirect("/home");
@@ -125,7 +123,7 @@ app.get("/home", async (req,res) => {
 });
 
 app.post("/login", async (req,res) => {
-    const verifyUser = await verifyUserLogin(req.body["username"], req.body["password"]);
+    const verifyUser = await verifyUserLogin(req.body["username"].trim(), req.body["password"].trim());
     if (verifyUser === false) {
         req.flash("error","Incorrect username or password");
         res.redirect("/login");
@@ -142,10 +140,18 @@ app.post("/register", async (req,res) => {
         req.flash("error", "Username is taken");
         res.redirect("/register");
     } else {
-        const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
-        req.session.userID = userID;
-        req.session.loginType = "register";
-        res.redirect("/home");
+        if (req.body["regusername"].length < 3) {
+            req.flash("error", "Username too short (3 characters at least)");
+            res.redirect("/register");
+        } else if (req.body["regpassword"].length < 6) {
+            req.flash("error", "Password too short (6 characters at least)");
+            res.redirect("/register");
+        } else {
+            const userID = await createUser(req.body["regusername"].trim(), req.body["regpassword"].trim());
+            req.session.userID = userID;
+            req.session.loginType = "register";
+            res.redirect("/home");
+        }
     }
 });
 
