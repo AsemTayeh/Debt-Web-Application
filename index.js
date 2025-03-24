@@ -20,7 +20,7 @@ app.get("/logout", (req,res) => {
     res.redirect("/login");
 })
 
-app.get("/home/:id", async (req,res) => {
+app.get("/home", async (req,res) => {
     if (!loggedIn) {
         res.redirect("/login");
     } else {
@@ -37,19 +37,7 @@ app.post("/login", async (req,res) => {
     if (verifyUser === false) {
         res.redirect("/login");
     }
-    else {
-        loggedIn = true;
-        res.redirect(`/home/${verifyUser}`);
-    }
 });
-
-app.get("/home", (req,res) => {
-    if (loggedIn) {
-        res.render("index.ejs");
-    } else {
-        res.redirect("/login");
-    }
-}); // Doesn't work as expected, home routing takes ID, this doesn't, dunno what to do honestly.
 
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
@@ -57,8 +45,6 @@ app.post("/register", async (req,res) => {
         res.redirect("/register");
     }
     const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
-    loggedIn = true;
-    res.redirect(`/home/${userID}`);
 });
 
 app.get("/login", (req,res) => { 
