@@ -11,11 +11,17 @@
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword1" name="regpassword" required>
+            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword1" name="regpassword" aria-describedby="basic-addon2" required> 
+            <div class="input-group-append">
+                <button id="see-pass"><span class="input-group-text" id="basic-addon2"><img src="main/images/eye-password-hide-svgrepo-com.svg" height="30px" width="30px" display="inline-block" id="see-img"></span></button>
+            </div>
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Confirm password</label>
-            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword2" name="confirmpassword" oninput="checkPassword()" required>
+            <div class="password-icon-flex">
+                <input type="password" class="form-control bg-dark text-white " id="exampleInputPassword2" name="confirmpassword" oninput="checkPassword()" required>
+                <img src="main/images/eye-password-hide-svgrepo-com.svg" height="30px" width="30px" display="inline-block">
+            </div> 
             <span id="pass-checker"></span>
         </div>
         <div class="mb-3 form-check">

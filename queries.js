@@ -88,3 +88,18 @@ export async function verifyUserLogin(email, password) {
       await db.end();
     }
   }
+
+  export async function getDebts(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT ID, amount, note FROM debtrecords WHERE userID = ?",
+        [id]
+      );
+      return rows;
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }

@@ -42,3 +42,8 @@ footer > h4 {
     margin-top: 1rem;
     font-family: "Montserrat", sans-serif;
 }
+#see-pass {
+    border: none;
+    background-color: white;
+}
+

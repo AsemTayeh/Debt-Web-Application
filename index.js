@@ -2,6 +2,7 @@ import { createUser } from "./queries.js";
 import { verifyUsername } from "./queries.js";
 import { verifyUserLogin } from "./queries.js";
 import { getUserName } from "./queries.js";
+import { getDebts } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -23,8 +24,10 @@ app.get("/home/:id", async (req,res) => {
     if (!loggedIn) {
         res.redirect("/login");
     } else {
+        const userDebts = getDebts(req.params.id);
         res.render("index.ejs", {
-            welcome: "Welcome back " +  await getUserName(req.params.id)
+            welcome: "Welcome back " +  await getUserName(req.params.id),
+            userDebts: userDebts
         });
     }
 });
