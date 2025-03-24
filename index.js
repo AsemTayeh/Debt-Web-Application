@@ -35,9 +35,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Fix styling in debts.ejs for cards, use user tees pass tees to see cards
-// Continue working on debts.ejs -> how to pass specific object data to modal
-// Delete POST handling
+// Review
 
 app.post("/debts/:id", async (req,res) => {
     if (!req.session.userID) {
