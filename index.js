@@ -7,6 +7,7 @@ import { setMessage } from "./queries.js";
 import { insertRecord } from "./queries.js";
 import { checkIfUserCanViewRecord } from "./queries.js";
 import { updateRecord } from "./queries.js";
+import { deleteRecord } from "./queries.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
 import morgan from "morgan";
@@ -38,11 +39,24 @@ app.use((req, res, next) => {
 // Continue working on debts.ejs -> how to pass specific object data to modal
 // Delete POST handling
 
+app.post("/debts/:id", async (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+        const canDelete = await deleteRecord(req.params.id, req.session.userID);
+        if (!canDelete) {
+            res.status(404).sendFile("Four0Four.html", {root: "public"});
+        } else {
+            req.flash("success", "Record deleted successfully!");
+            res.redirect("/home");
+        }
+    }
+});
 app.post("/update-record", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canUpdate = await updateRecord(parseInt(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
+        const canUpdate = await updateRecord(parseFloat(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
         if (!canUpdate) {
             req.flash("error", "Error updating record");
             res.redirect("/home");
@@ -88,7 +102,7 @@ app.post("/add-debt", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        await insertRecord(parseInt(req.body["value"].trim()), req.body["note"], req.session.userID);
+        await insertRecord(parseFloat(req.body["value"].trim()), req.body["note"], req.session.userID);
         req.flash("success", "Record added successfully!");
         res.redirect("/home");
     }

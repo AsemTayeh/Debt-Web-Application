@@ -232,3 +232,33 @@ export async function verifyUserLogin(email, password) {
         await db.end();
       }
   }
+
+  export async function deleteRecord(recordID, userID) {
+    const userExists = await verifyUserExistence(userID);
+    if (!userExists) {
+      console.log("User not found in updateRecord");
+      return false;
+    }
+    const recordExists = await verifyRecordExistence(recordID);
+    if (!recordExists) {
+      console.log("Record not found in update record");
+      return false;
+    }
+    const canView = checkIfUserCanViewRecord(recordID, userID);
+    if (!canView) {
+      console.log("Not authorized or record doesn't exist");
+      return false;
+    }
+    const db = await connectDB();
+    try {
+        const [result] = await db.execute(
+          "DELETE FROM debtrecords WHERE ID = ? AND userID = ?", 
+          [recordID, userID]
+        );
+        return true;
+      } catch (err) {
+        console.error("Error adding user:", err);
+      } finally {
+        await db.end();
+      }
+  }
