@@ -23,6 +23,12 @@ app.use([session({
     cookie: { secure: false }
 })]);
 
+// To-do:
+// Implement addForm.ejs to have a form that allows you to add a new note.
+// Implement debts.ejs in the else block to show you all your debt records
+// Which should be cards that have 3 buttons in them -> refer to Abood design, make sure
+// Each step is validated by sessionID.
+
 app.get("/add", (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
