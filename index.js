@@ -24,10 +24,19 @@ app.use([session({
 })]);
 
 // To-do:
-// Implement addForm.ejs to have a form that allows you to add a new note.
+// Implement add-debt post request which is sent from addForm.ejs which is a part of add.ejs
+// Which should add items to the database and redirect you to home, where your record should now be visible
 // Implement debts.ejs in the else block to show you all your debt records
 // Which should be cards that have 3 buttons in them -> refer to Abood design, make sure
 // Each step is validated by sessionID.
+
+app.post("/add-debt", (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+
+    }
+});
 
 app.get("/add", (req,res) => {
     if (!req.session.userID) {

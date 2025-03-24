@@ -97,3 +97,10 @@ footer > h4 {
 .welcome {
     padding: 10px;
 }
+.add-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+}
