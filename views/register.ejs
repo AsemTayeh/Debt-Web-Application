@@ -1,9 +1,9 @@
 <%-include("partials/header.ejs")%>
-<% if (locals.flashMessage) { %>
-    <h3 class="flash-message-bad"><%=flashMessage%></h3>
-    <% } %>
     <div class="login-form">
         <form method="POST" action="/register">
+            <% if (errorMessage.length) { %>
+                <div class="alert alert-danger" style="text-align:center"><%= errorMessage %></div>
+            <% } %>
             <div class="form-group">
                 <div style="margin-bottom: 0.5rem;">
                     <label for="username">Username</label>

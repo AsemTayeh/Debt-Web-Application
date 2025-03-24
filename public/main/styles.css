@@ -104,3 +104,6 @@ footer > h4 {
     align-items: center;
     height: 85vh;
 }
+.myCard {
+    box-shadow: inset;
+}

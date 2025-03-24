@@ -39,6 +39,7 @@ app.use((req, res, next) => {
 // add views for view, update, delete
 // When handling view/blogID and update, make sure to query BEFORE to know if the user can see
 // said blog ID
+
 app.post("/update-record", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
@@ -59,7 +60,6 @@ app.get("/update/:id", async (req,res) => {
     } else {
         const debtID = req.params.id;
         const canSee = await checkIfUserCanViewRecord(debtID, req.session.userID); // handles record and user existence as well
-        console.log(debtID);
         if (!canSee) {
             res.status(404).sendFile("Four0Four.html", {root: "public"});
         } else {
@@ -127,6 +127,7 @@ app.get("/home", async (req,res) => {
 app.post("/login", async (req,res) => {
     const verifyUser = await verifyUserLogin(req.body["username"], req.body["password"]);
     if (verifyUser === false) {
+        req.flash("error","Incorrect username or password");
         res.redirect("/login");
     } else {
         req.session.userID = verifyUser;
@@ -138,6 +139,7 @@ app.post("/login", async (req,res) => {
 app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
     if (isUserTaken) {
+        req.flash("error", "Username is taken");
         res.redirect("/register");
     } else {
         const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
