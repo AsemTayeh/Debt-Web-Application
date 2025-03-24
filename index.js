@@ -6,6 +6,7 @@ import { getDebts } from "./queries.js";
 import { setMessage } from "./queries.js";
 import { insertRecord } from "./queries.js";
 import { checkIfUserCanViewRecord } from "./queries.js";
+import flash from "connect-flash"
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -25,11 +26,33 @@ app.use([session({
     cookie: { secure: false }
 })]);
 
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.successMessage = req.flash("success");
+    res.locals.errorMessage = req.flash("error");
+    next();
+});
+
 // Fix styling in debts.ejs for cards, use user tees pass tees to see cards
 // Add routing for /view/:id etc, which are sent also from debts.ejs
 // add views for view, update, delete
 // When handling view/blogID and update, make sure to query BEFORE to know if the user can see
 // said blog ID
+
+app.get("/update/:id", async (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
+        if (!canSee) {
+            res.status(404).sendFile("Four0Four.html", {root: "public"});
+        } else {
+            res.render("update.ejs", {
+                objArrayOneEl: canSee
+            });
+        }
+    }
+});
 
 app.get("/view/:id", async (req,res) => {
     if (!req.session.userID) {
@@ -51,6 +74,7 @@ app.post("/add-debt", async (req,res) => {
         res.redirect("/login");
     } else {
         await insertRecord(req.body["value"], req.body["note"], req.session.userID);
+        req.flash("success", "Record added successfully!");
         res.redirect("/home");
     }
 });

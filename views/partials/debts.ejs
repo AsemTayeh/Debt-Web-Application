@@ -7,8 +7,12 @@
             <% for (let debt of debtsArray) { %> 
             <div class="card" id="rounded" style="width: 18rem;">
                 <div class="card-body bg-dark text-white">
-                    <h5 class="card-title"><%=debt.amount%> JD</h5>
-                    <p class="card-text"><%=debt.note%></p>
+                    <h5 class="card-title" style="text-align: center;"><%=debt.amount%> JD</h5>
+                    <% if (debt.note.length >= 35) { %> 
+                        <p class="card-text"><%=debt.note.slice(0,35)%>...</p>
+                    <% } else { %>
+                        <p class="card-text"><%=debt.note%></p>
+                        <% } %>
                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
                         <a href="/view/<%=debt.ID%>" class="btn btn-primary">View</a>
                         <a href="/update/<%=debt.ID%>" class="btn btn-warning">Update</a>

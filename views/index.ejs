@@ -1,3 +1,10 @@
 <%-include("partials/homeHeader.ejs")%>
+<% if (errorMessage.length) { %>
+    <div class="alert alert-danger"><%= errorMessage %></div>
+<% } %>
+
+<% if (successMessage.length) { %>
+    <div class="alert alert-success"><%= successMessage %></div>
+<% } %>
 <%-include("partials/debts.ejs")%>
 <%-include("partials/footer.ejs")%>
