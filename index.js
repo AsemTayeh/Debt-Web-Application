@@ -3,6 +3,7 @@ import { verifyUsername } from "./queries.js";
 import { verifyUserLogin } from "./queries.js";
 import { getUserName } from "./queries.js";
 import { getDebts } from "./queries.js";
+import { setMessage } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -33,14 +34,11 @@ app.get("/home", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        let message = "";
-        if (req.session.loginType === "login") {
-            message = "Welcome back ";
-        } else {
-            message = "Welcome ";
-        }
+        let message = setMessage(req.session.loginType);
+        let debtsArray = await getDebts(req.session.userID);
         res.render("index.ejs", {
             welcome: message +  await getUserName(req.session.userID) + "!",
+            debtsArray: debtsArray
         });
     }
 });

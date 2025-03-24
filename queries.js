@@ -103,3 +103,12 @@ export async function verifyUserLogin(email, password) {
       await db.end();
     }
   }
+  export function setMessage(loginType) {
+    let message = "";
+    if (loginType === "login") {
+        message = "Welcome back ";
+    } else {
+      message = "Welcome ";
+    }
+    return message;
+  }
