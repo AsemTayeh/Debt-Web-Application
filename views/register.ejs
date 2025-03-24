@@ -2,39 +2,56 @@
 <% if (locals.flashMessage) { %>
     <h3 class="flash-message-bad"><%=flashMessage%></h3>
     <% } %>
-<div class="login-form">
-    <form method="POST" action="/register">
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Username</label>
-            <input type="text" class="form-control bg-dark text-white" id="exampleInputEmail1" aria-describedby="emailHelp" name="regusername" required>
-            <div id="emailHelp" class="form-text">We'll never share your data with anyone else.</div>
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword1" name="regpassword" aria-describedby="basic-addon2" required> 
-            <div class="input-group-append">
-                <button id="see-pass"><span class="input-group-text" id="basic-addon2"><img src="main/images/eye-password-hide-svgrepo-com.svg" height="30px" width="30px" display="inline-block" id="see-img"></span></button>
+    <div class="login-form">
+        <form method="POST" action="/register">
+            <div class="form-group">
+                <div style="margin-bottom: 0.5rem;">
+                    <label for="username">Username</label>
+                </div>
+                <input type="text" id="username" class="form-control bg-dark text-white" name="regusername" required>
+                <small id="emailHelp" class="form-text text-muted">We'll never share your information with anyone else.</small>
+              </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" class="form-control bg-dark text-white" name="regpassword" oninput="checkPassword()" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="see-pass" onclick="seePass('password','hide-img')"><img src="/main/images/eye-password-hide-svgrepo-com.svg" id="hide-img"></span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Confirm password</label>
-            <div class="password-icon-flex">
-                <input type="password" class="form-control bg-dark text-white " id="exampleInputPassword2" name="confirmpassword" oninput="checkPassword()" required>
-                <img src="main/images/eye-password-hide-svgrepo-com.svg" height="30px" width="30px" display="inline-block">
-            </div> 
-            <span id="pass-checker"></span>
-        </div>
-        <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
-            <label class="form-check-label" for="exampleCheck1">I agree to the Terms of service</label>
-        </div>
-        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
-    </form>
-</div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Confirm Password</label>
+                <div class="input-group">
+                    <input type="password" id="confirm" class="form-control bg-dark text-white" placeholder="Enter your password" name="confirm" oninput="checkPassword()" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="see-pass-confirm" onclick="seePass('confirm','hide-img-confirm')"><img src="/main/images/eye-password-hide-svgrepo-com.svg" id="hide-img-confirm"></span>
+                    </div>
+                </div>
+                <span id="pass-checker"></span>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
+                <label class="form-check-label" for="exampleCheck1">I agree to the Terms of Service</label>
+              </div>
+              <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
 <script type="text/javascript">
+    function seePass(inputID, imgID) {
+        let field = document.querySelector("#" + inputID);
+        let image = document.querySelector("#" + imgID);
+        if (field.getAttribute("type") === "text") {
+            field.setAttribute("type", "password");
+            image.setAttribute("src", "/main/images/eye-password-hide-svgrepo-com.svg");
+            return;
+        }
+        field.setAttribute("type", "text");
+        image.setAttribute("src", "main/images/eye-close-up-svgrepo-com.svg");
+    }
     function checkPassword() {
-        let pass1 = document.querySelector("#exampleInputPassword1");
-        let pass2 = document.querySelector("#exampleInputPassword2");
+        let pass1 = document.querySelector("#password");
+        let pass2 = document.querySelector("#confirm");
         let passCheck = document.querySelector("#pass-checker");
         let button = document.querySelector("#submit");
         passCheck.style.fontWeight = "600";

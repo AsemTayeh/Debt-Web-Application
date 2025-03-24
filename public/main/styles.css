@@ -46,4 +46,38 @@ footer > h4 {
     border: none;
     background-color: white;
 }
-
+#see-pass:hover {
+    cursor:pointer;
+}
+#hide-img {
+    width: 20px;
+    height: 30px;
+}
+#password {
+    width: 3rem;
+}
+#hide-img-confirm {
+    width: 20px;
+    height: 30px;
+}
+#see-pass-confirm {
+    border: none;
+    background-color: white;
+}
+#see-pass-confirm:hover {
+    cursor: pointer;
+}
+#submit {
+    margin-top: 1rem;
+}
+#see-pass-login {
+    border: none;
+    background-color: white;
+}
+#see-pass-login:hover {
+    cursor:pointer;
+}
+#hide-img-login {
+    width: 20px;
+    height: 30px;
+}

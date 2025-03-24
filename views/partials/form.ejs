@@ -6,13 +6,31 @@
         <div id="emailHelp" class="form-text">We'll never share your data with anyone else.</div>
       </div>
       <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input type="password" class="form-control bg-dark text-white" id="exampleInputPassword1" name="password" required>
-      </div>
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+            <input type="password" id="password" class="form-control bg-dark text-white" name="password" required>
+            <div class="input-group-append">
+                <span class="input-group-text" id="see-pass-login" onclick="seePass('password','hide-img-login')"><img src="/main/images/eye-password-hide-svgrepo-com.svg" id="hide-img-login"></span>
+            </div>
+        </div>
+    </div>
       <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
         <label class="form-check-label" for="exampleCheck1">Remember me</label>
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+<script type="text/javascript">
+  function seePass(inputID, imgID) {
+      let field = document.querySelector("#" + inputID);
+      let image = document.querySelector("#" + imgID);
+      if (field.getAttribute("type") === "text") {
+          field.setAttribute("type", "password");
+          image.setAttribute("src", "/main/images/eye-password-hide-svgrepo-com.svg");
+          return;
+      }
+      field.setAttribute("type", "text");
+      image.setAttribute("src", "main/images/eye-close-up-svgrepo-com.svg");
+  }
+</script>
