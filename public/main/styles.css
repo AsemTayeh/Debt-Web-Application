@@ -8,6 +8,7 @@ body {
 footer > h4 {
     font-family: "Montserrat", sans-serif;
     text-align: center;
+    margin-top: 1rem;
 }
 .flex-asem {
     display: flex;
@@ -88,7 +89,11 @@ footer > h4 {
 .home-container {
     height: 75vh;
     display: flex;
+    flex-direction: column;
     width: 100%;
     justify-content: center;
     align-items: center;
+}
+.welcome {
+    padding: 10px;
 }

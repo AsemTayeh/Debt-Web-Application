@@ -23,6 +23,14 @@ app.use([session({
     cookie: { secure: false }
 })]);
 
+app.get("/add", (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+        res.render("add.ejs");
+    }
+});
+
 app.get("/logout", (req,res) => {
     req.session.destroy(err => {
         if (err) return res.send("Error logging out");
