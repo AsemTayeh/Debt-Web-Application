@@ -155,10 +155,37 @@ export async function verifyUserLogin(email, password) {
         await db.end();
       }
   }
+
+  export async function verifyRecordExistence(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT amount FROM debtrecords WHERE ID = ?",
+        [id]
+      );
+  
+      if (rows.length === 0) {
+        console.log("record not found in verifyRecord");
+        return false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }
+
   export async function checkIfUserCanViewRecord(recordID, userID) {
     const userExists = await verifyUserExistence(userID);
     if (!userExists) {
       console.log("User not found in view check");
+      return false;
+    }
+    const recordExists = await verifyRecordExistence(recordID);
+    if (!recordExists) {
+      console.log("record not found in view check");
       return false;
     }
     const db = await connectDB();
@@ -169,7 +196,7 @@ export async function verifyUserLogin(email, password) {
         );
         console.log(result);
         if (result.length === 0) {
-          console.log("User is not authorized to view record of other user");
+          console.log("User is not authorized to view record of other user or DNE");
           return false;
         } else {
           return true;

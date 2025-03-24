@@ -35,9 +35,9 @@ app.get("/view/:id", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); 
+        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles authorization
         if (!canSee) {
-            res.redirect("/home");
+            res.status(404).sendFile("Four0Four.html", {root: "public"});
         } else {
             res.redirect("/update"); // TEST THIS WILL REROUTE TO VIEW PAGE WHERE WE
             // WE QUERY THE NOTE AND GET THE PAGE
