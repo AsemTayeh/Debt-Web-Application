@@ -5,6 +5,7 @@ import { getUserName } from "./queries.js";
 import { getDebts } from "./queries.js";
 import { setMessage } from "./queries.js";
 import { insertRecord } from "./queries.js";
+import { checkIfUserCanViewRecord } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -24,12 +25,25 @@ app.use([session({
     cookie: { secure: false }
 })]);
 
-// To-do:
-// Implement add-debt post request which is sent from addForm.ejs which is a part of add.ejs
-// Which should add items to the debtrecords database and redirect you to home, where your record should now be visible
-// Implement debts.ejs in the else block to show you all your debt records that are sent from /home after being queried
-// Which should be cards that have 3 buttons in them -> refer to Abood design, make sure
-// Each step is validated by sessionID.
+// Fix styling in debts.ejs for cards, use user tees pass tees to see cards
+// Add routing for /view/:id etc, which are sent also from debts.ejs
+// add views for view, update, delete
+// When handling view/blogID and update, make sure to query BEFORE to know if the user can see
+// said blog ID
+
+app.get("/view/:id", async (req,res) => {
+    if (!req.session.userID) {
+        res.redirect("/login");
+    } else {
+        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); 
+        if (!canSee) {
+            res.redirect("/home");
+        } else {
+            res.redirect("/update"); // TEST THIS WILL REROUTE TO VIEW PAGE WHERE WE
+            // WE QUERY THE NOTE AND GET THE PAGE
+        }
+    }
+});
 
 app.post("/add-debt", async (req,res) => {
     if (!req.session.userID) {
