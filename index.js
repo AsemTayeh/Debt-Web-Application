@@ -10,25 +10,37 @@ import session from "express-session";
 
 const PORT = 3000;
 const app = express();
-let loggedIn = false;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
 
+app.use([session({
+    secret: 'SFDdGWEG56##%^GHG$H46234GHS4254Y5G2D37Hh&5BJNVBDF5%%',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }
+})]);
+
 app.get("/logout", (req,res) => {
-    loggedIn = false;
-    res.redirect("/login");
-})
+    req.session.destroy(err => {
+        if (err) return res.send("Error logging out");
+        res.redirect("/login");
+    });
+});
 
 app.get("/home", async (req,res) => {
-    if (!loggedIn) {
+    if (!req.session.userID) {
         res.redirect("/login");
     } else {
-        const userDebts = getDebts(req.params.id);
+        let message = "";
+        if (req.session.loginType === "login") {
+            message = "Welcome back ";
+        } else {
+            message = "Welcome ";
+        }
         res.render("index.ejs", {
-            welcome: "Welcome back " +  await getUserName(req.params.id),
-            userDebts: userDebts
+            welcome: message +  await getUserName(req.session.userID) + "!",
         });
     }
 });
@@ -37,6 +49,10 @@ app.post("/login", async (req,res) => {
     const verifyUser = await verifyUserLogin(req.body["username"], req.body["password"]);
     if (verifyUser === false) {
         res.redirect("/login");
+    } else {
+        req.session.userID = verifyUser;
+        req.session.loginType = "login";
+        res.redirect("/home");
     }
 });
 
@@ -44,8 +60,12 @@ app.post("/register", async (req,res) => {
     const isUserTaken = await verifyUsername(req.body["regusername"]);
     if (isUserTaken) {
         res.redirect("/register");
+    } else {
+        const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
+        req.session.userID = userID;
+        req.session.loginType = "register";
+        res.redirect("/home");
     }
-    const userID = await createUser(req.body["regusername"], req.body["regpassword"]);
 });
 
 app.get("/login", (req,res) => { 
