@@ -4,6 +4,7 @@ import { verifyUserLogin } from "./queries.js";
 import { getUserName } from "./queries.js";
 import { getDebts } from "./queries.js";
 import { setMessage } from "./queries.js";
+import { insertRecord } from "./queries.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import express from "express";
@@ -25,16 +26,17 @@ app.use([session({
 
 // To-do:
 // Implement add-debt post request which is sent from addForm.ejs which is a part of add.ejs
-// Which should add items to the database and redirect you to home, where your record should now be visible
-// Implement debts.ejs in the else block to show you all your debt records
+// Which should add items to the debtrecords database and redirect you to home, where your record should now be visible
+// Implement debts.ejs in the else block to show you all your debt records that are sent from /home after being queried
 // Which should be cards that have 3 buttons in them -> refer to Abood design, make sure
 // Each step is validated by sessionID.
 
-app.post("/add-debt", (req,res) => {
+app.post("/add-debt", async (req,res) => {
     if (!req.session.userID) {
         res.redirect("/login");
     } else {
-
+        await insertRecord(req.body["value"], req.body["note"], req.session.userID);
+        res.redirect("/home");
     }
 });
 

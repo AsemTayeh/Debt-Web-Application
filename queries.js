@@ -112,3 +112,46 @@ export async function verifyUserLogin(email, password) {
     }
     return message;
   }
+
+  export async function verifyUserExistence(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT username FROM users WHERE ID = ?",
+        [id]
+      );
+  
+      if (rows.length === 0) {
+        console.log("User not found in verifyUser");
+        return false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }
+
+  export async function insertRecord(value, note, userID) {
+    const userExists = await verifyUserExistence(userID);
+    if (!userExists) {
+      console.log("User not found in insertRecord");
+      return false;
+    }
+    const db = await connectDB();
+    try {
+        const [result] = await db.execute(
+          "INSERT INTO debtrecords (amount, note, userID) VALUES (?, ?, ?)", 
+          [value, note, userID]
+        );
+        const lastInsertedId = result.insertId;
+        console.log("Last Inserted ID:", lastInsertedId);
+        return lastInsertedId;
+      } catch (err) {
+        console.error("Error adding user:", err);
+      } finally {
+        await db.end();
+      }
+  }

@@ -3,8 +3,24 @@
         <h1 class="no-records">You have no debt records!</h1>
         <a href="/add" class="btn btn-dark btn-lg" role="button" aria-disabled="true">Add new debt record</a>
         <% } else { %>
-            
-            <a href="/add" class="btn btn-dark btn-lg" role="button" aria-disabled="true">Add new debt record</a>
+            <div style="display: flex; width: 100%; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <% for (let debt of debtsArray) { %> 
+            <div class="card" id="rounded" style="width: 18rem;">
+                <div class="card-body bg-dark text-white">
+                    <h5 class="card-title"><%=debt.amount%> JD</h5>
+                    <p class="card-text"><%=debt.note%></p>
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                        <a href="/view/<%=debt.ID%>" class="btn btn-primary">View</a>
+                        <a href="/update/<%=debt.ID%>" class="btn btn-warning">Update</a>
+                        <a href="/delete/<%=debt.ID%>" class="btn btn-danger">Delete</a>
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+            </div>
+                <div style="margin-top: 1rem;">
+                    <a href="/add" class="btn btn-dark btn-lg" role="button" aria-disabled="true">Add new debt record</a>
+                </div>
             <% } %>
     <% } %>
 
