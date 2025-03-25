@@ -8,6 +8,8 @@ import { insertRecord } from "./queries.js";
 import { checkIfUserCanViewRecord } from "./queries.js";
 import { updateRecord } from "./queries.js";
 import { deleteRecord } from "./queries.js";
+import { authenticate } from "./authenticateAndAuthorize.js";
+import { verifyInput } from "./authenticateAndAuthorize.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
 import morgan from "morgan";
@@ -22,7 +24,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
 
 app.use([session({
-    secret: 'SFDdGWEG56##%^GHG$H46234GHS4254Y5G2D37Hh&5BJNVBDF5%%',
+    secret: process.env.sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
@@ -34,36 +36,32 @@ app.use((req, res, next) => {
     res.locals.errorMessage = req.flash("error");
     next();
 });
-
-// Fix styling in debts.ejs for cards, use user tees pass tees to see cards
-// Continue working on debts.ejs -> how to pass specific object data to modal
-// Delete POST handling
+app.use(authenticate);
 
 app.post("/debts/:id", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
+    const canDelete = await deleteRecord(req.params.id, req.session.userID);
+    if (!canDelete) {
+        res.status(404).sendFile("Four0Four.html", {root: "public"});
     } else {
-        const canDelete = await deleteRecord(req.params.id, req.session.userID);
-        if (!canDelete) {
-            res.status(404).sendFile("Four0Four.html", {root: "public"});
-        } else {
-            req.flash("success", "Record deleted successfully!");
-            res.redirect("/home");
-        }
+        req.flash("success", "Record deleted successfully!");
+        res.redirect("/home");
     }
 });
 app.post("/update-record", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
+    try {
+        validatedInputObj = verifyInput(req); 
+    } catch (error) {
+        req.flash("error", error.message());
+        res.redirect("/home");
+    }
+
+    const canUpdate = await updateRecord(parseFloat(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
+    if (!canUpdate) {
+        req.flash("error", "Error updating record");
+        res.redirect("/home");
     } else {
-        const canUpdate = await updateRecord(parseFloat(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
-        if (!canUpdate) {
-            req.flash("error", "Error updating record");
-            res.redirect("/home");
-        } else {
-            req.flash("success", "Updated record successfully!");
-            res.redirect("/home");
-        }
+        req.flash("success", "Updated record successfully!");
+        res.redirect("/home");
     }
 });
 app.get("/update/:id", async (req,res) => {
