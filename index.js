@@ -1,4 +1,4 @@
-import { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord } from "./queries.js";
+import { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord, getTotalDebt, pay } from "./queries.js";
 import { authenticate, verifyLoginInput, verifyRecordInput, setMessage } from "./middleware/authenticateAndAuthorize.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
@@ -27,6 +27,16 @@ app.use((req, res, next) => {
     res.locals.successMessage = req.flash("success");
     res.locals.errorMessage = req.flash("error");
     next();
+});
+
+app.post("/pay/:id", authenticate, async (req,res) => {
+    const canPay = await pay(req.params.id, req.session.userID);
+    if (!canPay) {
+        res.status(404).sendFile("Four0Four.html", {root: "public"});
+    } else {
+        req.flash("success", "Debt paid off successfully!");
+        res.redirect("/home");
+    }
 });
 
 app.post("/debts/:id/delete", authenticate, async (req,res) => {
@@ -109,9 +119,11 @@ app.get("/logout", authenticate, (req,res) => {
 app.get("/home", authenticate, async (req,res) => {
     let message = setMessage(req.session.loginType);
     let debtsArray = await getDebts(req.session.userID);
+    let totalDebt = await getTotalDebt(req.session.userID);
     res.render("index.ejs", {
         welcome: message +  await getUserName(req.session.userID) + "!",
-        debtsArray: debtsArray
+        debtsArray: debtsArray,
+        totalDebt: totalDebt.totalamount
     });
 });
 

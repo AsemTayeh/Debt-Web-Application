@@ -89,11 +89,27 @@ async function verifyUserLogin(email, password) {
     }
   }
 
+  async function getTotalDebt(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT SUM(amount) as totalamount FROM debtrecords WHERE userID = ? AND ispaid = 0",
+        [id]
+      );
+      console.log(rows[0]);
+      return rows[0];
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }
+
   async function getDebts(id) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
-        "SELECT ID, amount, note FROM debtrecords WHERE userID = ?",
+        "SELECT ID, amount, note, ispaid FROM debtrecords WHERE userID = ?",
         [id]
       );
       return rows;
@@ -232,5 +248,29 @@ async function verifyUserLogin(email, password) {
         await db.end();
       }
   }
+  async function pay(recordID, userID) {
+    const recordExists = await verifyRecordExistence(recordID);
+    if (!recordExists) {
+      console.log("Record not found in delete record");
+      return false;
+    }
+    const canView = await checkIfUserCanViewRecord(recordID, userID);
+    if (!canView) {
+      console.log("Not authorized or record doesn't exist");
+      return false;
+    }
+    const db = await connectDB();
+    try {
+        const [result] = await db.execute(
+          "UPDATE debtrecords SET ispaid = 1 WHERE ID = ? AND userID = ? AND ispaid = 0", 
+          [recordID, userID]
+        );
+        return result.affectedRows > 0;
+      } catch (err) {
+        console.error("Error adding user:", err);
+      } finally {
+        await db.end();
+      }
+  }
 
-  export { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord, verifyUserExistence };
+  export { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord, verifyUserExistence, getTotalDebt, pay };
