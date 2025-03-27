@@ -1,21 +1,13 @@
-import { createUser } from "./queries.js";
-import { verifyUsername } from "./queries.js";
-import { verifyUserLogin } from "./queries.js";
-import { getUserName } from "./queries.js";
-import { getDebts } from "./queries.js";
-import { setMessage } from "./queries.js";
-import { insertRecord } from "./queries.js";
-import { checkIfUserCanViewRecord } from "./queries.js";
-import { updateRecord } from "./queries.js";
-import { deleteRecord } from "./queries.js";
-import { authenticate } from "./authenticateAndAuthorize.js";
-import { verifyInput } from "./authenticateAndAuthorize.js";
+import { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord } from "./queries.js";
+import { authenticate, verifyLoginInput, verifyRecordInput, setMessage } from "./authenticateAndAuthorize.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
+import dotenv from "dotenv";
 import morgan from "morgan";
 import express from "express";
 import session from "express-session";
 
+dotenv.config();
 const PORT = 3000;
 const app = express();
 
@@ -24,7 +16,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
 
 app.use([session({
-    secret: process.env.sessionSecret,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
@@ -36,9 +28,8 @@ app.use((req, res, next) => {
     res.locals.errorMessage = req.flash("error");
     next();
 });
-app.use(authenticate);
 
-app.post("/debts/:id", async (req,res) => {
+app.post("/debts/:id/delete", authenticate, async (req,res) => {
     const canDelete = await deleteRecord(req.params.id, req.session.userID);
     if (!canDelete) {
         res.status(404).sendFile("Four0Four.html", {root: "public"});
@@ -47,15 +38,17 @@ app.post("/debts/:id", async (req,res) => {
         res.redirect("/home");
     }
 });
-app.post("/update-record", async (req,res) => {
+
+app.post("/debts/:id/update", authenticate, async (req,res) => {
+    let validatedRecord;
     try {
-        validatedInputObj = verifyInput(req); 
+        validatedRecord = verifyRecordInput(req.body["updAmount"], req.body["updNote"]); 
     } catch (error) {
-        req.flash("error", error.message());
-        res.redirect("/home");
+        req.flash("error", error.message);
+        return res.redirect("/home");
     }
 
-    const canUpdate = await updateRecord(parseFloat(req.body["updAmount"].trim()), req.body["updNote"].trim(), req.session.userID, parseInt(req.body["updID"]));
+    const canUpdate = await updateRecord(validatedRecord.amount, validatedRecord.note, req.session.userID, req.params.id);
     if (!canUpdate) {
         req.flash("error", "Error updating record");
         res.redirect("/home");
@@ -64,78 +57,74 @@ app.post("/update-record", async (req,res) => {
         res.redirect("/home");
     }
 });
-app.get("/update/:id", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
+app.get("/update/:id", authenticate, async (req,res) => {
+    const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
+
+    if (!canSee) {
+        res.status(404).sendFile("Four0Four.html", {root: "public"});
     } else {
-        const debtID = req.params.id;
-        const canSee = await checkIfUserCanViewRecord(debtID, req.session.userID); // handles record and user existence as well
-        if (!canSee) {
-            res.status(404).sendFile("Four0Four.html", {root: "public"});
-        } else {
-            res.render("update.ejs", {
-                objArrayOneEl: canSee,
-                debtID: debtID
-            });
-        }
+        res.render("update.ejs", {
+        objArrayOneEl: canSee,
+        debtID: req.params.id
+        });
     }
 });
 
-app.get("/view/:id", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
+app.get("/view/:id", authenticate, async (req,res) => {
+    const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
+    if (!canSee) {
+        res.status(404).sendFile("Four0Four.html", {root: "public"});
     } else {
-        const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
-        if (!canSee) {
-            res.status(404).sendFile("Four0Four.html", {root: "public"});
-        } else {
-            res.render("view.ejs", {
-                objArrayOneEl: canSee
-            });
-        }
+        res.render("view.ejs", {
+        objArrayOneEl: canSee
+        });
     }
 });
 
-app.post("/add-debt", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
-    } else {
-        await insertRecord(parseFloat(req.body["value"].trim()), req.body["note"], req.session.userID);
-        req.flash("success", "Record added successfully!");
-        res.redirect("/home");
+app.post("/add-debt", authenticate, async (req,res) => {
+    let validatedRecordInput;
+    try {
+        validatedRecordInput = verifyRecordInput(req.body["value"], req.body["note"]);
+    } catch (error) {
+        req.flash("error", error.message);
+        return res.redirect("/home");
     }
+
+    await insertRecord(validatedRecordInput.amount, validatedRecordInput.note, req.session.userID);
+    req.flash("success", "Record added successfully!");
+    res.redirect("/home");
 });
 
-app.get("/add", (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
-    } else {
-        res.render("add.ejs");
-    }
+app.get("/add", authenticate, (req,res) => {
+    res.render("add.ejs");
 });
 
-app.get("/logout", (req,res) => {
+app.get("/logout", authenticate, (req,res) => {
     req.session.destroy(err => {
         if (err) return res.send("Error logging out");
         res.redirect("/login");
     });
 });
 
-app.get("/home", async (req,res) => {
-    if (!req.session.userID) {
-        res.redirect("/login");
-    } else {
-        let message = setMessage(req.session.loginType);
-        let debtsArray = await getDebts(req.session.userID);
-        res.render("index.ejs", {
-            welcome: message +  await getUserName(req.session.userID) + "!",
-            debtsArray: debtsArray
-        });
-    }
+app.get("/home", authenticate, async (req,res) => {
+    let message = setMessage(req.session.loginType);
+    let debtsArray = await getDebts(req.session.userID);
+    res.render("index.ejs", {
+        welcome: message +  await getUserName(req.session.userID) + "!",
+        debtsArray: debtsArray
+    });
 });
 
 app.post("/login", async (req,res) => {
-    const verifyUser = await verifyUserLogin(req.body["username"].trim(), req.body["password"].trim());
+    let user;
+    try {
+        user = verifyLoginInput(req);
+    } catch (error) {
+        req.flash("error", error.message);
+        return res.redirect("/login");
+    }
+
+    const verifyUser = await verifyUserLogin(user.username, user.password);
     if (verifyUser === false) {
         req.flash("error","Incorrect username or password");
         res.redirect("/login");
@@ -147,23 +136,23 @@ app.post("/login", async (req,res) => {
 });
 
 app.post("/register", async (req,res) => {
-    const isUserTaken = await verifyUsername(req.body["regusername"].trim());
+    let newUser;
+    try {
+        newUser = verifyLoginInput(req);
+    } catch (error) {
+        req.flash("error", error.message);
+        return res.redirect("/register");
+    }
+
+    const isUserTaken = await verifyUsername(newUser.username);
     if (isUserTaken) {
         req.flash("error", "Username is taken");
         res.redirect("/register");
     } else {
-        if (req.body["regusername"].length < 3) {
-            req.flash("error", "Username too short (3 characters at least)");
-            res.redirect("/register");
-        } else if (req.body["regpassword"].length < 6) {
-            req.flash("error", "Password too short (6 characters at least)");
-            res.redirect("/register");
-        } else {
-            const userID = await createUser(req.body["regusername"].trim(), req.body["regpassword"].trim());
-            req.session.userID = userID;
-            req.session.loginType = "register";
-            res.redirect("/home");
-        }
+        const userID = await createUser(newUser.username, newUser.password);
+        req.session.userID = userID;
+        req.session.loginType = "register";
+        res.redirect("/home");
     }
 });
 

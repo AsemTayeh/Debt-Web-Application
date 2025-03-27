@@ -103,16 +103,6 @@ export async function verifyUserLogin(email, password) {
       await db.end();
     }
   }
-  export function setMessage(loginType) {
-    let message = "";
-    if (loginType === "login") {
-        message = "Welcome back ";
-    } else {
-      message = "Welcome ";
-    }
-    return message;
-  }
-
   export async function verifyUserExistence(id) {
     const db = await connectDB();
     try {
@@ -236,12 +226,12 @@ export async function verifyUserLogin(email, password) {
   export async function deleteRecord(recordID, userID) {
     const userExists = await verifyUserExistence(userID);
     if (!userExists) {
-      console.log("User not found in updateRecord");
+      console.log("User not found in deleteRecord");
       return false;
     }
     const recordExists = await verifyRecordExistence(recordID);
     if (!recordExists) {
-      console.log("Record not found in update record");
+      console.log("Record not found in delete record");
       return false;
     }
     const canView = checkIfUserCanViewRecord(recordID, userID);

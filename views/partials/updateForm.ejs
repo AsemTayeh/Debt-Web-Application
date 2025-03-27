@@ -3,7 +3,7 @@
     <div class="container mt-5">
         <div class="card shadow-sm p-4">
             <h2 class="text-center">Update Debt Record</h2>
-            <form action="/update-record" method="POST">
+            <form action="/debts/<%=debtID%>/update" method="POST">
                 <div class="mb-3">
                     <label for="value" class="form-label">New Value</label>
                     <input type="number" step="any" id="value" name="updAmount" value="<%=objArrayOneEl[0].amount%>" class="form-control bg-dark text-white" required>
