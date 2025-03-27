@@ -1,5 +1,5 @@
 import { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord } from "./queries.js";
-import { authenticate, verifyLoginInput, verifyRecordInput, setMessage } from "./authenticateAndAuthorize.js";
+import { authenticate, verifyLoginInput, verifyRecordInput, setMessage } from "./middleware/authenticateAndAuthorize.js";
 import flash from "connect-flash"
 import bodyParser from "body-parser";
 import dotenv from "dotenv";

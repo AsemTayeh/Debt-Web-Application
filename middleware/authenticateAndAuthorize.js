@@ -1,7 +1,13 @@
+import { verifyUserExistence } from "../queries.js";
+
 function authenticate(req, res, next) {
     if (!req.session.userID) {
         return res.redirect("/login");
     }
+    if (!verifyUserExistence(req.session.userID)) {
+        return res.redirect("/login");
+    }
+    
     next();
 }
 
