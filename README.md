@@ -94,15 +94,15 @@ This application prioritizes security at every level. It implements robust authe
 5- Create the two following Databases:
 
 First:
-
+```sql
 create table users (
 ID INT AUTO_INCREMENT PRIMARY KEY,
 username varchar(25) NOT NULL UNIQUE,
 hashed_password varchar(255) NOT NULL
 );
-
+```
 Second:
-
+```sql
 create table debtrecords (
 ID INT AUTO_INCREMENT PRIMARY KEY,
 amount decimal(8,2) NOT NULL,
@@ -111,7 +111,7 @@ ispaid bool DEFAULT false,
 userID INT,
 CONSTRAINT FK_USER FOREIGN KEY (userID) REFERENCES users(ID) ON DELETE SET NULL
 );
-
+```
 6- Fill ```.env``` using the example
 
 7- Run the program using ```node index.js```
