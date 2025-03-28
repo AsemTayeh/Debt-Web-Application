@@ -5,18 +5,28 @@
         <% } else { %>
             <div style="display: flex; width: 100%; justify-content: center; gap: 1rem; flex-wrap: wrap;">
             <% for (let debt of debtsArray) { %> 
-            <div class="card" id="rounded" style="width: 18rem;">
+            <div class="card" id="rounded" style="width: 25rem;">
                 <div class="card-body bg-dark text-white">
-                    <h5 class="card-title" style="text-align: center;"><%=debt.amount%> JD</h5>
+                  <% if (debt.ispaid) { %>
+                    <h5>Paid✅</h5>
+                    <h5 class="card-title" style="text-align: center; text-decoration: line-through;"><%=debt.amount%> JD</h5>
+                    <% } else { %>
+                      <h5 class="card-title" style="text-align: center;"><%=debt.amount%> JD</h5>
+                      <% } %>
                     <% if (debt.note.length >= 34) { %>
                         <p class="card-text" style="text-align: center;"><%=debt.note.slice(0,35)%>...</p>
-                    <% } else {%>
+                    <% } else { %>
                         <p class="card-text" style="text-align: center;"><%=debt.note%></p>
                         <% } %>
                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-                        <a href="/view/<%=debt.ID%>" class="btn btn-primary">View</a>
-                        <a href="/update/<%=debt.ID%>" class="btn btn-warning">Update</a>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<%=debt.ID%>" onclick="getID(this)">
+                        <a href="/view/<%=debt.ID%>" class="btn btn-primary" style="width: 5rem;">View</a>
+                        <a href="/update/<%=debt.ID%>" class="btn btn-warning" style="width: 5rem;">Update</a>
+                        <% if (!debt.ispaid) { %>
+                        <form action="/pay/<%=debt.ID%>" method="POST">
+                          <button type="submit" class="btn btn-success" style="width: 5rem;">Pay</button>
+                        </form>
+                        <% } %>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<%=debt.ID%>" onclick="getID(this)" style="width: 5rem;">
                             Delete
                           </button>
                     </div>
@@ -37,7 +47,7 @@
     let deleteForm = document.querySelector("#deleteForm");
 
     if (deleteForm) {
-      deleteForm.action = `/debts/${id}`;
+      deleteForm.action = `/debts/${id}/delete`;
     }
   }
   </script>

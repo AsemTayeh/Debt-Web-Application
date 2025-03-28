@@ -35,6 +35,15 @@
           <h3 class="welcome"><%=welcome%></h3>
       <% } %>
     </div>
+    <div>
+      <% if (locals.totalDebt) { %>
+        <% if (totalDebt != 0) { %>
+          <h3 class="welcome-back" style="margin-left: 1rem">
+            Your total debts are: <%=totalDebt%> JD
+          </h3>
+        <% } %>
+    <% } %>
+    </div>
     <div class="home-container">
 
     

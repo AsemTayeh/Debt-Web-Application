@@ -1,7 +1,7 @@
 import {connectDB} from "./db.js"
 import bcrypt from "bcrypt";
 
-export async function createUser(name, password) {
+async function createUser(name, password) {
     const db = await connectDB();
     try {
         const saltRounds = 10;
@@ -19,7 +19,7 @@ export async function createUser(name, password) {
         await db.end();
       }
 }
-export async function verifyUsername(name) {
+async function verifyUsername(name) {
     const db = await connectDB();
     try {
         const [result] = await db.execute(
@@ -38,7 +38,7 @@ export async function verifyUsername(name) {
       }
 }
 
-export async function verifyUserLogin(email, password) {
+async function verifyUserLogin(email, password) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
@@ -68,7 +68,7 @@ export async function verifyUserLogin(email, password) {
     }
   }
 
-  export async function getUserName(id) {
+  async function getUserName(id) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
@@ -89,11 +89,27 @@ export async function verifyUserLogin(email, password) {
     }
   }
 
-  export async function getDebts(id) {
+  async function getTotalDebt(id) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
-        "SELECT ID, amount, note FROM debtrecords WHERE userID = ?",
+        "SELECT SUM(amount) as totalamount FROM debtrecords WHERE userID = ? AND ispaid = 0",
+        [id]
+      );
+      console.log(rows[0]);
+      return rows[0];
+    } catch (err) {
+      console.error("Error verifying user:", err);
+    } finally {
+      await db.end();
+    }
+  }
+
+  async function getDebts(id) {
+    const db = await connectDB();
+    try {
+      const [rows] = await db.execute(
+        "SELECT ID, amount, note, ispaid FROM debtrecords WHERE userID = ?",
         [id]
       );
       return rows;
@@ -103,17 +119,7 @@ export async function verifyUserLogin(email, password) {
       await db.end();
     }
   }
-  export function setMessage(loginType) {
-    let message = "";
-    if (loginType === "login") {
-        message = "Welcome back ";
-    } else {
-      message = "Welcome ";
-    }
-    return message;
-  }
-
-  export async function verifyUserExistence(id) {
+  async function verifyUserExistence(id) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
@@ -122,7 +128,7 @@ export async function verifyUserLogin(email, password) {
       );
   
       if (rows.length === 0) {
-        console.log("User not found in verifyUser");
+        console.log("User not found in verifyUserExistence");
         return false;
       } else {
         return true;
@@ -134,12 +140,7 @@ export async function verifyUserLogin(email, password) {
     }
   }
 
-  export async function insertRecord(value, note, userID) {
-    const userExists = await verifyUserExistence(userID);
-    if (!userExists) {
-      console.log("User not found in insertRecord");
-      return false;
-    }
+  async function insertRecord(value, note, userID) {
     const db = await connectDB();
     try {
         const [result] = await db.execute(
@@ -156,7 +157,7 @@ export async function verifyUserLogin(email, password) {
       }
   }
 
-  export async function verifyRecordExistence(id) {
+  async function verifyRecordExistence(id) {
     const db = await connectDB();
     try {
       const [rows] = await db.execute(
@@ -177,12 +178,7 @@ export async function verifyUserLogin(email, password) {
     }
   }
 
-  export async function checkIfUserCanViewRecord(recordID, userID) {
-    const userExists = await verifyUserExistence(userID);
-    if (!userExists) {
-      console.log("User not found in view check");
-      return false;
-    }
+  async function checkIfUserCanViewRecord(recordID, userID) {
     const recordExists = await verifyRecordExistence(recordID);
     if (!recordExists) {
       console.log("record not found in view check");
@@ -208,12 +204,7 @@ export async function verifyUserLogin(email, password) {
       }
   }
 
-  export async function updateRecord(value, note, userID, recordID) {
-    const userExists = await verifyUserExistence(userID);
-    if (!userExists) {
-      console.log("User not found in updateRecord");
-      return false;
-    }
+  async function updateRecord(value, note, userID, recordID) {
     const recordExists = await verifyRecordExistence(recordID);
     if (!recordExists) {
       console.log("Record not found in update record");
@@ -233,15 +224,10 @@ export async function verifyUserLogin(email, password) {
       }
   }
 
-  export async function deleteRecord(recordID, userID) {
-    const userExists = await verifyUserExistence(userID);
-    if (!userExists) {
-      console.log("User not found in updateRecord");
-      return false;
-    }
+  async function deleteRecord(recordID, userID) {
     const recordExists = await verifyRecordExistence(recordID);
     if (!recordExists) {
-      console.log("Record not found in update record");
+      console.log("Record not found in delete record");
       return false;
     }
     const canView = checkIfUserCanViewRecord(recordID, userID);
@@ -262,3 +248,29 @@ export async function verifyUserLogin(email, password) {
         await db.end();
       }
   }
+  async function pay(recordID, userID) {
+    const recordExists = await verifyRecordExistence(recordID);
+    if (!recordExists) {
+      console.log("Record not found in delete record");
+      return false;
+    }
+    const canView = await checkIfUserCanViewRecord(recordID, userID);
+    if (!canView) {
+      console.log("Not authorized or record doesn't exist");
+      return false;
+    }
+    const db = await connectDB();
+    try {
+        const [result] = await db.execute(
+          "UPDATE debtrecords SET ispaid = 1 WHERE ID = ? AND userID = ? AND ispaid = 0", 
+          [recordID, userID]
+        );
+        return result.affectedRows > 0;
+      } catch (err) {
+        console.error("Error adding user:", err);
+      } finally {
+        await db.end();
+      }
+  }
+
+  export { createUser, verifyUsername, verifyUserLogin, getUserName, getDebts, insertRecord, checkIfUserCanViewRecord, updateRecord, deleteRecord, verifyUserExistence, getTotalDebt, pay };
