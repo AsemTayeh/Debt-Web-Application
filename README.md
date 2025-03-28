@@ -81,3 +81,37 @@ Image Twelve - Example showing pop-up to confirm deletion of a record:
 
 ### Security:
 This application prioritizes security at every level. It implements robust authentication using session management, with a secret key securely stored in an environment variable. Authorization mechanisms ensure users can only access their own information and debt records, preventing unauthorized access to sensitive data. To safeguard against SQL injection vulnerabilities, we utilize the mysql2 library, which offers strong protection against such attacks. User passwords are never stored in plain text—only securely hashed passwords are stored, leveraging the BCrypt hashing algorithm. Furthermore, every user transaction is authenticated and authorized to ensure that actions are legitimate and comply with access controls.
+## How to install:
+
+1- Clone the repo using ```git clone```
+
+2- Install NodeJS if not installed: https://nodejs.org/en/download
+
+3- Install all dependencies using ```npm install```
+
+4- Install mySQL server if not installed: https://www.mysql.com/downloads/ 
+
+5- Create the two following Databases:
+
+First:
+
+create table users (
+ID INT AUTO_INCREMENT PRIMARY KEY,
+username varchar(25) NOT NULL UNIQUE,
+hashed_password varchar(255) NOT NULL
+);
+
+Second:
+
+create table debtrecords (
+ID INT AUTO_INCREMENT PRIMARY KEY,
+amount decimal(8,2) NOT NULL,
+note varchar(255),
+ispaid bool DEFAULT false,
+userID INT,
+CONSTRAINT FK_USER FOREIGN KEY (userID) REFERENCES users(ID) ON DELETE SET NULL
+);
+
+6- Fill ```.env``` using the example
+
+7- Run the program using ```node index.js```
