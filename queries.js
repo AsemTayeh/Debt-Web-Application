@@ -152,6 +152,7 @@ async function verifyUserLogin(email, password) {
         return lastInsertedId;
       } catch (err) {
         console.error("Error adding user:", err);
+        throw new Error("Database insert failed: " + err.message);
       } finally {
         await db.end();
       }
@@ -219,6 +220,7 @@ async function verifyUserLogin(email, password) {
         return true;
       } catch (err) {
         console.error("Error adding user:", err);
+        throw new Error("Database update failed: " + err.message);
       } finally {
         await db.end();
       }

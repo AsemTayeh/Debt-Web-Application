@@ -57,15 +57,20 @@ app.post("/debts/:id/update", authenticate, async (req,res) => {
         req.flash("error", error.message);
         return res.redirect("/home");
     }
+    
+    try {
+        const canUpdate = await updateRecord(validatedRecord.amount, validatedRecord.note, req.session.userID, req.params.id);
+    } catch (error) {
+        req.flash("error", error.message);
+        return res.redirect("/home");
+    }
 
-    const canUpdate = await updateRecord(validatedRecord.amount, validatedRecord.note, req.session.userID, req.params.id);
     if (!canUpdate) {
         req.flash("error", "Error updating record");
-        res.redirect("/home");
     } else {
         req.flash("success", "Updated record successfully!");
-        res.redirect("/home");
     }
+    res.redirect("/home");
 });
 app.get("/update/:id", authenticate, async (req,res) => {
     const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
@@ -100,8 +105,13 @@ app.post("/add-debt", authenticate, async (req,res) => {
         return res.redirect("/home");
     }
 
-    await insertRecord(validatedRecordInput.amount, validatedRecordInput.note, req.session.userID);
-    req.flash("success", "Record added successfully!");
+    try {
+        await insertRecord(validatedRecordInput.amount, validatedRecordInput.note, req.session.userID);
+        req.flash("success", "Record added successfully!");
+    } catch (error) {
+        req.flash("error", error.message);
+    }
+
     res.redirect("/home");
 });
 
