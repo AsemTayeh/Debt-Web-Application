@@ -35,7 +35,7 @@ app.post("/pay/:id", authenticate, async (req,res) => {
         res.status(404).sendFile("Four0Four.html", {root: "public"});
     } else {
         req.flash("success", "Debt paid off successfully!");
-        res.redirect("/home");
+        res.redirect("/debts/home");
     }
 });
 
@@ -45,7 +45,7 @@ app.post("/debts/:id/delete", authenticate, async (req,res) => {
         res.status(404).sendFile("Four0Four.html", {root: "public"});
     } else {
         req.flash("success", "Record deleted successfully!");
-        res.redirect("/home");
+        res.redirect("/debts/home");
     }
 });
 
@@ -55,14 +55,14 @@ app.post("/debts/:id/update", authenticate, async (req,res) => {
         validatedRecord = verifyRecordInput(req.body["updAmount"], req.body["updNote"]); 
     } catch (error) {
         req.flash("error", error.message);
-        return res.redirect("/home");
+        return res.redirect("/debts/home");
     }
-    
+    let canUpdate;
     try {
-        const canUpdate = await updateRecord(validatedRecord.amount, validatedRecord.note, req.session.userID, req.params.id);
+        canUpdate = await updateRecord(validatedRecord.amount, validatedRecord.note, req.session.userID, req.params.id);
     } catch (error) {
         req.flash("error", error.message);
-        return res.redirect("/home");
+        return res.redirect("/debts/home");
     }
 
     if (!canUpdate) {
@@ -70,7 +70,7 @@ app.post("/debts/:id/update", authenticate, async (req,res) => {
     } else {
         req.flash("success", "Updated record successfully!");
     }
-    res.redirect("/home");
+    res.redirect("/debts/home");
 });
 app.get("/update/:id", authenticate, async (req,res) => {
     const canSee = await checkIfUserCanViewRecord(req.params.id, req.session.userID); // handles record and user existence as well
@@ -96,13 +96,13 @@ app.get("/view/:id", authenticate, async (req,res) => {
     }
 });
 
-app.post("/add-debt", authenticate, async (req,res) => {
+app.post("/debts/create", authenticate, async (req,res) => {
     let validatedRecordInput;
     try {
         validatedRecordInput = verifyRecordInput(req.body["value"], req.body["note"]);
     } catch (error) {
         req.flash("error", error.message);
-        return res.redirect("/home");
+        return res.redirect("/debts/home");
     }
 
     try {
@@ -112,10 +112,10 @@ app.post("/add-debt", authenticate, async (req,res) => {
         req.flash("error", error.message);
     }
 
-    res.redirect("/home");
+    res.redirect("/debts/home");
 });
 
-app.get("/add", authenticate, (req,res) => {
+app.get("/debts/add", authenticate, (req,res) => {
     res.render("add.ejs");
 });
 
@@ -126,7 +126,7 @@ app.get("/logout", authenticate, (req,res) => {
     });
 });
 
-app.get("/home", authenticate, async (req,res) => {
+app.get("/debts/home", authenticate, async (req,res) => {
     let message = setMessage(req.session.loginType);
     let debtsArray = await getDebts(req.session.userID);
     let totalDebt = await getTotalDebt(req.session.userID);
@@ -153,7 +153,7 @@ app.post("/login", async (req,res) => {
     } else {
         req.session.userID = verifyUser;
         req.session.loginType = "login";
-        res.redirect("/home");
+        res.redirect("/debts/home");
     }
 });
 
@@ -174,7 +174,7 @@ app.post("/register", async (req,res) => {
         const userID = await createUser(newUser.username, newUser.password);
         req.session.userID = userID;
         req.session.loginType = "register";
-        res.redirect("/home");
+        res.redirect("/debts/home");
     }
 });
 
